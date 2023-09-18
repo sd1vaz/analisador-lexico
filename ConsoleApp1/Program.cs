@@ -103,13 +103,13 @@ class AnalisadorLexico
 
     public bool VerificaReservada(string palavra)
     {
-        return (palavra.ToUpper() == palavra) && (palavra.Length <= 12) || palavrasReservadas.Contains(palavra);
+        return (palavra.ToUpper() == palavra) && (palavra.Length <= 12) && !palavra.Contains(";") && !palavra.Contains(":") || palavrasReservadas.Contains(palavra) && !palavra.Contains(";" ) && !palavra.Contains(":") ;
     }
-
+    
     public bool VerificaSimboloAbertura(string palavra)
     {
         return simbolosAbertura.Contains(palavra);
-    }
+    } 
 
     public bool VerificaSimboloFechamento(string palavra)
     {
@@ -142,16 +142,19 @@ class Program
     {
         
         AnalisadorLexico analisadorLexico = new AnalisadorLexico();
-        string file_path = "C:\\Users\\Caio-\\OneDrive\\Documentos\\files\\";
+        //string file_path = "C:\\Users\\Caio-\\OneDrive\\Documentos\\compilador\\";// colocar nesta linha o endereço do arquivo o base esse endereço sero o mesmo aonde sera gerado o arquivo de output
+        Console.WriteLine("Insira o caminho do seu arquivo input: ");
+        string file = Console.ReadLine();
+        string file_path = file.Replace("\\","\\\\" ) ; 
 
-        StreamReader arqv_entrada = new StreamReader(file_path + "input.txt");
-        StreamWriter arqv_saida = new StreamWriter(file_path + "output.txt");
+        StreamReader arqv_entrada = new StreamReader(file_path + "\\input.txt");
+        StreamWriter arqv_saida = new StreamWriter(file_path + "\\output.txt");
 
         while (!arqv_entrada.EndOfStream)
         {
             string linha = arqv_entrada.ReadLine();
             string[] palavras = linha.Split();
-            string linha_saida = "";
+            string linha_saida = " ";
 
             analisadorLexico.ZeraAbertosFechados();
 
@@ -266,7 +269,8 @@ class Program
                 }
                 else if (analisadorLexico.VerificaReservada(palavra))
                 {
-                    linha_saida += "<RESERVADA>";
+                    linha_saida += $"<RESERVADA>({palavra}) " +
+                        "";
                 }
                 else
                 {
@@ -279,7 +283,7 @@ class Program
             {
                 linha_saida += "<ERRO> ";
             }
-            string[] linhas = File.ReadAllLines(file_path + "input.txt");
+            string[] linhas = File.ReadAllLines(file_path + "\\input.txt");
 
            
 
@@ -298,10 +302,9 @@ class Program
 
             arqv_saida.Write(linha_saida);
         }
-
         arqv_entrada.Close();
         arqv_saida.Close();
-
+        Console.WriteLine("\n arquivo output gerado");
         Console.WriteLine("\n\nPressione qualquer tecla para fechar o programa...");
         Console.ReadKey();
     }
